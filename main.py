@@ -24,16 +24,9 @@ def update_window(fields) :
     pygame.display.update()
     pygame.display.flip()
 
-def generate_fields(row:int,col:int,rectSize=16,initX=0,initY=0) -> list :
-
-    mineIndexes=[]
-    totalMines=row*col
-    for i in range(0,int(math.sqrt(row*col))) :
-        mineIndexes.append(random.randint(0,totalMines))
-
+def generate_fields(col:int,row:int,rectSize=16,initX=0,initY=0) -> list :
     fields=[]
     posY=initY
-    index=0
     
     for c in range(0,col) :
         fieldsRow=[]
@@ -41,41 +34,58 @@ def generate_fields(row:int,col:int,rectSize=16,initX=0,initY=0) -> list :
 
         for r in range(0,row) :
             field=Field(posX,posY,rectSize,False,0)
-            if index in mineIndexes :
-                field.isMine=True
-                if c-1 > 0 :
-                    if r-1 > 0 :
-                        fields[c-1][r-1].value += 1
-                    fields[c-1][r].value += 1
-                    if r+1 < row :
-                        fields[c-1][r+1].value += 1
-                if r-1 > 0 :
-                    fields[c][r-1].value += 1
-                if r+1 < row :
-                    fields[c][r+1].value += 1
-                if c+1 < col :
-                    if r-1 > 0 :
-                        fields[c+1][r-1].value += 1
-                    fields[c+1][r].value += 1
-                    if r+1 < row :
-                        fields[c+1][r+1].value += 1
             posX += rectSize+1
             fieldsRow.append(field)
-            index += 1
         posY += rectSize+1
         fields.append(fieldsRow)
     return fields
 
-# def initiate_field_values(oldFields:list,row:int,col:int) -> list :
-#     fields=oldFields
+def generate_mine_index(col:int,row:int) -> list :
+    mineIndexes=[]
+    totalMines=row*col
+    for i in range(0,int(math.sqrt(row*col))) :
+        mineIndexes.append(random.randint(0,totalMines))
 
-#     return fields
+    return mineIndexes
+
+def generate_mines(oldFields:list,row:int,col:int) -> list :
+    mineIndex=generate_mine_index(col,row)
+    fields=oldFields
+    index=0
+    for c in range(0,col) :
+        for r in range(0,row) :
+            if index in mineIndex :
+                fields[c][r].isMine=True
+                if c-1 > 0 :
+                    if r-1 >= 0 :
+                        fields[c-1][r-1].value += 1
+                    fields[c-1][r].value += 1
+                    if r+1 < row :
+                        fields[c-1][r+1].value +=1
+
+                if r-1 >= 0 :
+                    fields[c][r-1].value += 1
+                if r+1 < row :
+                    fields[c][r+1].value += 1
+
+                if c+1 < col :
+                    if r-1 >= 0 : 
+                        fields[c+1][r-1].value += 1
+                    fields[c+1][r].value += 1
+                    if r+1 < row :
+                        fields[c+1][r-1].value += 1
+            index += 1 
+    return fields
 
 def main() :
     gameRunning=True
     clock=pygame.time.Clock()
 
-    fields=generate_fields(16,16,30,10,10)
+    row=16
+    col=16
+
+    fields=generate_fields(col,row,30,10,10)
+    fields=generate_mines(fields,row,col)
 
     while gameRunning :
         clock.tick(FPS)

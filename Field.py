@@ -6,7 +6,6 @@ FLAG_COLOR=Color.GREEN
 MINE_COLOR=Color.RED
 
 class Field :
-
     def __init__(self,x:int,y:int,size=16,mine=False,value=0) :
         self.isOpen=False
         self.isFlagged=False
